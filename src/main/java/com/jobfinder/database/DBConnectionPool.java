@@ -46,13 +46,13 @@ public class DBConnectionPool {
 	final static String driver = "org.postgresql.Driver";
     // 数据库连接地址
     //final static String jdbcUrl = "jdbc:mysql://localhost:3306/anybox";
-    static String jdbcUrl = "jdbc:postgresql://ec2-50-19-236-178.compute-1.amazonaws.com:5432/dus327o98lfme"
+    static String jdbcUrl = "jdbc:postgresql://ec2-23-23-81-171.compute-1.amazonaws.com:5432/d60lbs9bfp1eii"
     		+ "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
     
     // 数据库用户名
-    static String user = "icwrhoamdyfrfp";
+    static String user = "iwqunnfaosouqf";
     // 数据库密码
-    static String passwd = "bQv1I71kugoccl5pud1C7Jzn61";
+    static String passwd = "OEIZcbbdjDLWSRV76KPyk0gf3T";
     // 连接池初始化大小
     final static int initialSize = 5;
     // 连接池最小空闲
@@ -74,7 +74,7 @@ public class DBConnectionPool {
     }
     
     //sql
-    private final static String sql = "SELECT * FROM anybox.user;";
+    private final static String sql = "SELECT * FROM jobfinder.user;";
 
     /**
      * 获取Apache tomcat jdbc pool数据源
