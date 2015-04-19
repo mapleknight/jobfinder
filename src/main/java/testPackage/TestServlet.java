@@ -19,7 +19,6 @@ import com.jobfinder.database.DBConnectionPool;
  * HelloWorld servlet.
  */
 
-//@WebServlet("/testDataBase")
 public class TestServlet extends HttpServlet {
 	/**
 	 * 
