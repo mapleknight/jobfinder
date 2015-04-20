@@ -1,7 +1,6 @@
 package com.jobfinder.utils;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,7 +21,6 @@ public class Xml2JsonUtil {
 	 *            xml string
 	 * @return sucess return json string;fail return null
 	 */
-	@SuppressWarnings("unchecked")
 	public static String xml2JSON(String xml) {
 		JSONObject obj = new JSONObject();
 		try {

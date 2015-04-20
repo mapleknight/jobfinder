@@ -62,7 +62,7 @@ public class SignInServlet extends HttpServlet{
             
 			
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			result = JSONObject.fromObject(new ReturnObject(StateCode.FAILED_SYSTEM));
 		} finally {
 			//result.remove("content");

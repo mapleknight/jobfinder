@@ -1,9 +1,7 @@
 package com.jobfinder.addons.careerbuilder;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -24,15 +22,33 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.jobfinder.addons.IAddonInterface;
 import com.jobfinder.common.JobDetail;
+import com.jobfinder.common.JobList;
 import com.jobfinder.common.JobListEntry;
 import com.jobfinder.common.JobListQueryParameters;
+import com.jobfinder.utils.StringTool;
 import com.jobfinder.utils.Xml2JsonUtil;
 
 @SuppressWarnings("deprecation")
 public class CareerbuilderAddon implements IAddonInterface {
+	
+	/**
+	 * Singleton
+	 */
+	private static CareerbuilderAddon instance;
+	
+	public static CareerbuilderAddon getInstance(){
+        if(instance==null)//1    
+            synchronized(CareerbuilderAddon.class){//2    
+                if(instance==null)//3    
+                	instance = new CareerbuilderAddon();//4
+            }    
+        return instance;
+    }
+
+	private HttpClient httpClient = new DefaultHttpClient();
 
 	@Override
-	public JobListEntry[] getJobList(JobListQueryParameters p) {
+	public JobList getJobList(JobListQueryParameters p) {
 
 		List<NameValuePair> qparams = new ArrayList<NameValuePair>();
 		// DeveloperKey=WDHL5DS66L2JTCTLYM63&HostSite=US&Keywords=software&OrderBy=Date
@@ -49,86 +65,195 @@ public class CareerbuilderAddon implements IAddonInterface {
 			qparams.add(new BasicNameValuePair("Location", p.getLocation()));
 		}
 
-		HttpClient httpClient = new DefaultHttpClient();
-
+		JobList list = new JobList();
+		URI uri = null;
 		try {
-			URI uri = URIUtils.createURI("http",
+			uri = URIUtils.createURI("http",
 					"api.careerbuilder.com", -1, "/v1/jobsearch",
 					URLEncodedUtils.format(qparams, "UTF-8"), null);
-			HttpGet get = new HttpGet(uri);
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
+		
+		HttpGet get = new HttpGet(uri);
+		try {
+			get.addHeader("Connection", "close");
 			get.addHeader("Accept-Charset", "utf-8");
-
 			HttpResponse response = httpClient.execute(get);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				InputStream instreams = entity.getContent();
-				String xmlStr = convertStreamToString(instreams);
+				String xmlStr = StringTool.convertStreamToString(instreams);
 				String jsonStr = Xml2JsonUtil.xml2JSON(xmlStr);
+				System.out.println(jsonStr);
 				JSONObject resp = JSONObject.fromObject(jsonStr);
 				resp = JSONObject.fromObject(resp.get("ResponseJobSearch"));
 				
-				String totalCount = JSONArray.fromObject(resp.get("TotalCount")).get(0).toString();
+				String totalCount = resp.getJSONArray("TotalCount").getString(0);
+				String firstItemIndex = resp.getJSONArray("FirstItemIndex").getString(0);
+				String lastItemIndex = resp.getJSONArray("LastItemIndex").getString(0);
+				String totalPages = resp.getJSONArray("TotalPages").getString(0);
 				
-				String firstItemIndex = JSONArray.fromObject(resp.get("FirstItemIndex")).get(0).toString();
-				String lastItemIndex = JSONArray.fromObject(resp.get("LastItemIndex")).get(0).toString();
-				String totalPages = JSONArray.fromObject(resp.get("TotalPages")).get(0).toString();
-				JSONArray jobArray = JSONArray.fromObject(JSONObject.fromObject(JSONArray.fromObject(resp.get("Results")).get(0)).get("JobSearchResult"));
+				JSONArray jobArray = resp.getJSONArray("Results").getJSONObject(0).getJSONArray("JobSearchResult");
+				
+				
+				list.setFirstItemIndex(firstItemIndex);
+				list.setLastItemIndex(lastItemIndex);
+				list.setTotalCount(totalCount);
+				list.setTotalPages(totalPages);
+				
 				for(Object obj : jobArray)
 				{
-					JSONObject job = JSONObject.fromObject(obj);
-					System.out.println(job.toString());
+					JSONObject detail = JSONObject.fromObject(obj);
+					JobListEntry entry = new JobListEntry();
+					
+					if(detail.containsKey("JobTitle")){
+						String jobTitle = detail.getJSONArray("JobTitle").getString(0);
+						entry.setJobTitle(jobTitle);
+					}
+					if(detail.containsKey("Company")){
+						String company = detail.getJSONArray("Company").getString(0);
+						entry.setCompany(company);
+					}
+					String postDate = detail.getJSONArray("PostedDate").getString(0);
+					String jobID = detail.getJSONArray("DID").getString(0);
+					String location = detail.getJSONArray("Location").getString(0);
+					
+					
+					entry.setJobID(jobID);
+					
+					entry.setLocation(location);
+					entry.setPostDate(postDate);
+					
+					list.addJob(JSONObject.fromObject(entry));
 				}
 				
-				//System.out.println(job.toString());
-				// Do not need the rest
-				get.abort();
 			}
 
-		} catch (URISyntaxException | IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
+		} finally {
+			get.releaseConnection();
+			get.abort();
 		}
 
-		return null;
+		return list;
 	}
 
 	@Override
-	public JobDetail getJobDetail() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static String convertStreamToString(InputStream is) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		StringBuilder sb = new StringBuilder();
-
-		String line = null;
+	public JobDetail getJobDetail(String jobID) {
+		List<NameValuePair> qparams = new ArrayList<NameValuePair>();
+		// DeveloperKey=WDHL5DS66L2JTCTLYM63&HostSite=US&Keywords=software&OrderBy=Date
+		qparams.add(new BasicNameValuePair("DeveloperKey",
+				"WDHL5DS66L2JTCTLYM63"));
+		qparams.add(new BasicNameValuePair("DID", jobID));
+		
+		URI uri = null;
 		try {
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			uri = URIUtils.createURI("http",
+					"api.careerbuilder.com", -1, "/v1/job",
+					URLEncodedUtils.format(qparams, "UTF-8"), null);
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
 		}
-		return sb.toString();
+		
+		JobDetail job = new JobDetail();
+		
+		HttpGet get = new HttpGet(uri);
+		try {
+			get.addHeader("Connection", "close");
+			get.addHeader("Accept-Charset", "utf-8");
+			HttpResponse response = httpClient.execute(get);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				InputStream instreams = entity.getContent();
+				String xmlStr = StringTool.convertStreamToString(instreams);
+				String jsonStr = Xml2JsonUtil.xml2JSON(xmlStr);
+				JSONObject resp = JSONObject.fromObject(jsonStr);
+				System.out.println(resp.toString());
+				
+				resp = JSONObject.fromObject(resp.get("ResponseJob"));
+				
+				JSONObject jobJson = JSONArray.fromObject(resp.get("Job")).getJSONObject(0);
+				
+				job.setJobID(jobID);
+				
+				String jobDescription = null;
+				String company = null;
+				String contactPhone = null;
+				String jobType = null;
+				String jobTitle = null;
+				String jobRequirements = null;
+				String urlLink = null;
+				
+				if(jobJson.containsKey("Company")) {
+					company = JSONArray.fromObject(jobJson.get("Company")).getString(0);
+				}
+				
+				if(jobJson.containsKey("ContactInfoPhone")) {
+					contactPhone = JSONArray.fromObject(jobJson.get("ContactInfoPhone")).getString(0);
+				}
+				
+				if(jobJson.containsKey("JobTitle")) {
+					jobTitle = JSONArray.fromObject(jobJson.get("JobTitle")).getString(0);
+				}
+				
+				if(jobJson.containsKey("EmploymentType")) {
+					jobType = JSONArray.fromObject(jobJson.get("EmploymentType")).getString(0);
+				}
+				
+				if(jobJson.containsKey("JobDescription")) {
+					jobDescription = JSONArray.fromObject(jobJson.get("JobDescription")).getString(0);
+				}
+				
+				if(jobJson.containsKey("JobRequirements")) {
+					jobRequirements = JSONArray.fromObject(jobJson.get("JobRequirements")).getString(0);
+				}
+				
+				if(jobJson.containsKey("ApplyURL")) {
+					urlLink = JSONArray.fromObject(jobJson.get("ApplyURL")).getString(0);
+				}
+				
+				job.setCompany(company);
+				job.setContactPhone(contactPhone);
+				job.setJobDescription(jobDescription);
+				job.setJobRequirements(jobRequirements);
+				job.setJobTitle(jobTitle);
+				job.setJobType(jobType);
+				job.setUrlLink(urlLink);
+				
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} finally {
+			get.releaseConnection();
+			get.abort();
+		}
+		
+		return job;
 	}
+
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		JobListQueryParameters p = new JobListQueryParameters();
 		String[] keywords = {"software"};
 		p.setKeywords(keywords);
-		p.setLocation("dc");
+		p.setLocation("arlington, va");
 		
 		CareerbuilderAddon cba = new CareerbuilderAddon();
-		cba.getJobList(p);
+		//JobDetail job = cba.getJobDetail("JHT8G45Y2JNM4BZW35T");
+		JobList job = cba.getJobList(p);
+		System.out.println(JSONObject.fromObject(job).toString());
 		
 	}
 

@@ -13,11 +13,16 @@ public class DBConnectionPool {
 	/**
 	 * Singleton
 	 */
-	private static DBConnectionPool instance = new DBConnectionPool();
+	private static DBConnectionPool instance;
 	
 	public static DBConnectionPool getInstance(){
-		return instance;
-	}
+        if(instance==null)//1    
+            synchronized(DBConnectionPool.class){//2    
+                if(instance==null)//3    
+                	instance = new DBConnectionPool();//4    
+            }    
+        return instance;           
+    }
 	
 	/**
 	 * private constructor

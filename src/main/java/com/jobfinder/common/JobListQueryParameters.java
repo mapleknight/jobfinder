@@ -62,11 +62,10 @@ public class JobListQueryParameters {
 	private String[] keywords;
 	
 	/**
-	 * Date, Relevance
-	 * OVERALL_SCORE_DESC
-	 * EXPLORER_DATE_DESC
+	 * for CareerBuilder: Date, Relevance
+	 * for JobServe: OVERALL_SCORE_DESC, EXPLORER_DATE_DESC
 	 */
-	private String sortBy;
+	private String sortBy = "Relevance";
 	
 	/**
 	 * page number of this search

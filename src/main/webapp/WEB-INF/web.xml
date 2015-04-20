@@ -33,6 +33,23 @@
 		<url-pattern>/signon</url-pattern>
 	</servlet-mapping>
 	
+	<servlet>
+		<servlet-name>JobSearchListServlet</servlet-name>
+		<servlet-class>com.jobfinder.servlet.JobSearchListServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JobSearchListServlet</servlet-name>
+		<url-pattern>/jobs</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>JobSearchServlet</servlet-name>
+		<servlet-class>com.jobfinder.servlet.JobSearchServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JobSearchServlet</servlet-name>
+		<url-pattern>/job</url-pattern>
+	</servlet-mapping>
 	
 	<servlet>
 		<servlet-name>Test</servlet-name>
