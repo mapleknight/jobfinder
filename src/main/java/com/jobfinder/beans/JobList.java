@@ -1,4 +1,4 @@
-package com.jobfinder.common;
+package com.jobfinder.beans;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

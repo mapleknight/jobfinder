@@ -1,4 +1,4 @@
-package com.jobfinder.common;
+package com.jobfinder.beans;
 
 /**
  * this is the parameters used to search jobs

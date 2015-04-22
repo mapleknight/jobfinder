@@ -21,10 +21,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.jobfinder.addons.AbstractJobFactory;
-import com.jobfinder.common.JobDetail;
-import com.jobfinder.common.JobList;
-import com.jobfinder.common.JobListEntry;
-import com.jobfinder.common.JobListQueryParameters;
+import com.jobfinder.beans.JobDetail;
+import com.jobfinder.beans.JobList;
+import com.jobfinder.beans.JobListEntry;
+import com.jobfinder.beans.JobListQueryParameters;
 import com.jobfinder.utils.StringTool;
 import com.jobfinder.utils.Xml2JsonUtil;
 

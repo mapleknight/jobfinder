@@ -2,10 +2,10 @@ package com.jobfinder.service;
 
 import com.jobfinder.addons.AbstractJobFactory;
 import com.jobfinder.addons.AddonFactory;
+import com.jobfinder.beans.JobDetail;
+import com.jobfinder.beans.JobList;
+import com.jobfinder.beans.JobListQueryParameters;
 import com.jobfinder.beans.ReturnObject;
-import com.jobfinder.common.JobDetail;
-import com.jobfinder.common.JobList;
-import com.jobfinder.common.JobListQueryParameters;
 import com.jobfinder.common.StateCode;
 
 import net.sf.json.JSONObject;

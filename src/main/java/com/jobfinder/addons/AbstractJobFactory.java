@@ -1,8 +1,8 @@
 package com.jobfinder.addons;
 
-import com.jobfinder.common.JobDetail;
-import com.jobfinder.common.JobList;
-import com.jobfinder.common.JobListQueryParameters;
+import com.jobfinder.beans.JobDetail;
+import com.jobfinder.beans.JobList;
+import com.jobfinder.beans.JobListQueryParameters;
 
 public abstract class AbstractJobFactory {
 	

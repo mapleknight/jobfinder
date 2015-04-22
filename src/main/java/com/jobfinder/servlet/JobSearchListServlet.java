@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
+import com.jobfinder.beans.JobListQueryParameters;
 import com.jobfinder.beans.ReturnObject;
-import com.jobfinder.common.JobListQueryParameters;
 import com.jobfinder.common.StateCode;
 import com.jobfinder.service.JobSearchService;
 

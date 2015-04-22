@@ -1,4 +1,4 @@
-package com.jobfinder.common;
+package com.jobfinder.beans;
 
 /**
  * this class defines the detail of a job
