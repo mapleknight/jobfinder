@@ -35,7 +35,7 @@ public class JobSearchListServlet extends HttpServlet{
 	    response.setContentType("application/json; charset=utf-8");
 	    
 	    PrintWriter out = null;
-		JSONObject result = null;
+		Object result = null;
 
 		try {
 			out = response.getWriter();
