@@ -4,11 +4,10 @@ import com.jobfinder.common.JobDetail;
 import com.jobfinder.common.JobList;
 import com.jobfinder.common.JobListQueryParameters;
 
-
-public interface IAddonInterface {
+public abstract class AbstractJobFactory {
 	
-	public JobList getJobList(JobListQueryParameters p);
+	public abstract JobList getJobList(JobListQueryParameters p);
 	
-	public JobDetail getJobDetail(String jobID);
+	public abstract JobDetail getJobDetail(String jobID);
 
 }

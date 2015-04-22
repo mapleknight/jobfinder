@@ -1,8 +1,7 @@
 package com.jobfinder.service;
 
-import com.jobfinder.addons.IAddonInterface;
-import com.jobfinder.addons.careerbuilder.CareerbuilderAddon;
-import com.jobfinder.addons.jobserve.JobserveAddon;
+import com.jobfinder.addons.AbstractJobFactory;
+import com.jobfinder.addons.AddonFactory;
 import com.jobfinder.beans.ReturnObject;
 import com.jobfinder.common.JobDetail;
 import com.jobfinder.common.JobList;
@@ -16,10 +15,7 @@ public class JobSearchService {
 	public JSONObject getJobList(JobListQueryParameters p, String jobSource) {
 		ReturnObject ret = new ReturnObject();
 		ret.setState(StateCode.SUCCESS);
-		IAddonInterface jobSearchAddon = CareerbuilderAddon.getInstance();;
-		if(jobSource.equalsIgnoreCase("jobserve")){
-			jobSearchAddon = JobserveAddon.getInstance();
-		}
+		AbstractJobFactory jobSearchAddon = AddonFactory.getConcreteFactory(jobSource);
 		
 		JobList jobList = jobSearchAddon.getJobList(p);
 		if(null == jobList)
@@ -35,10 +31,7 @@ public class JobSearchService {
 	public JSONObject getJob(String jobID, String jobSource) {
 		ReturnObject ret = new ReturnObject();
 		ret.setState(StateCode.SUCCESS);
-		IAddonInterface jobSearchAddon = CareerbuilderAddon.getInstance();;
-		if(jobSource.equalsIgnoreCase("jobserve")){
-			jobSearchAddon = JobserveAddon.getInstance();
-		}
+		AbstractJobFactory jobSearchAddon = AddonFactory.getConcreteFactory(jobSource);
 		
 		JobDetail job = jobSearchAddon.getJobDetail(jobID);
 		if(null == job)

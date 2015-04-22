@@ -18,7 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
-import com.jobfinder.addons.IAddonInterface;
+import com.jobfinder.addons.AbstractJobFactory;
 import com.jobfinder.common.JobDetail;
 import com.jobfinder.common.JobList;
 import com.jobfinder.common.JobListEntry;
@@ -27,18 +27,18 @@ import com.jobfinder.utils.GeoUtil;
 import com.jobfinder.utils.StringTool;
 
 @SuppressWarnings("deprecation")
-public class JobserveAddon implements IAddonInterface {
-
+public class JobserveFactory extends AbstractJobFactory {
+	
 	/**
 	 * Singleton
 	 */
-	private static JobserveAddon instance;
+	private static JobserveFactory instance;
 
-	public static JobserveAddon getInstance() {
-		if (instance == null)// 1
-			synchronized (JobserveAddon.class) {// 2
-				if (instance == null)// 3
-					instance = new JobserveAddon();// 4
+	public static JobserveFactory getInstance() {
+		if (instance == null)
+			synchronized (JobserveFactory.class) {
+				if (instance == null)
+					instance = new JobserveFactory();
 			}
 		return instance;
 	}
@@ -46,6 +46,7 @@ public class JobserveAddon implements IAddonInterface {
 	private static final String AuthorizationHeader = "token 6t6eXsLhq8JuESV3ZjXUQCdUzxzcpM3r3kZif239d-85w2Abc-avgvmelgAouveRxGouN6Yx-fAmVfT54d-MYsw5ohP_tqC-uIrQviJY8X8vRx_0Do4AfDdqaYVJCRYqiv2MQVTlB9aEX6z7r748QMYRWynYAZF8Y6Xd3hEYzQU";
 
 	private HttpClient httpClient = new DefaultHttpClient();
+
 
 	@Override
 	public JobList getJobList(JobListQueryParameters p) {
@@ -127,7 +128,6 @@ public class JobserveAddon implements IAddonInterface {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -136,45 +136,6 @@ public class JobserveAddon implements IAddonInterface {
 		}
 
 		return list;
-	}
-
-	public JSONObject getLocation(JSONObject latAndlng) {
-
-		URI uri = null;
-		try {
-			uri = URIUtils.createURI("http", "services.jobserve.com", -1,
-					"/Locations/" + latAndlng.getString("lat") + "/"
-							+ latAndlng.getString("lng"), null, null);
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-
-		HttpGet get = new HttpGet(uri);
-		JSONObject location = null;
-		try {
-			get.addHeader("Connection", "close");
-			get.addHeader("Accept-Charset", "utf-8");
-			get.addHeader("Authorization", AuthorizationHeader);
-			get.addHeader("Accept", "application/json");
-
-			HttpResponse response = httpClient.execute(get);
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				InputStream instreams = entity.getContent();
-				String jsonStr = StringTool.convertStreamToString(instreams);
-				location = JSONObject.fromObject(jsonStr).getJSONObject(
-						"Location");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		} finally {
-			get.releaseConnection();
-			get.abort();
-		}
-
-		return location;
 	}
 
 	@Override
@@ -248,7 +209,6 @@ public class JobserveAddon implements IAddonInterface {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -258,21 +218,44 @@ public class JobserveAddon implements IAddonInterface {
 		
 		return job;
 	}
+	
+	public JSONObject getLocation(JSONObject latAndlng) {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		JobListQueryParameters p = new JobListQueryParameters();
-		String[] keywords = { "software" };
-		p.setKeywords(keywords);
-		p.setLocation("arlington, va");
+		URI uri = null;
+		try {
+			uri = URIUtils.createURI("http", "services.jobserve.com", -1,
+					"/Locations/" + latAndlng.getString("lat") + "/"
+							+ latAndlng.getString("lng"), null, null);
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+			return null;
+		}
 
-		JobserveAddon jsa = new JobserveAddon();
-		// JSONObject geo = GeoUtil.getLocation(p.getLocation());
-		// jsa.getLocation(geo);
-		//JobList joblist = jsa.getJobList(p);
-		//System.out.println(JSONObject.fromObject(joblist).toString());
-		//F88468DCE5A211CCDE05B01C5DB533A0
-		JobDetail job = jsa.getJobDetail("F88468DCE5A211CCDE05B01C5DB533A0");
-		System.out.println(JSONObject.fromObject(job).toString());
+		HttpGet get = new HttpGet(uri);
+		JSONObject location = null;
+		try {
+			get.addHeader("Connection", "close");
+			get.addHeader("Accept-Charset", "utf-8");
+			get.addHeader("Authorization", AuthorizationHeader);
+			get.addHeader("Accept", "application/json");
+
+			HttpResponse response = httpClient.execute(get);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				InputStream instreams = entity.getContent();
+				String jsonStr = StringTool.convertStreamToString(instreams);
+				location = JSONObject.fromObject(jsonStr).getJSONObject(
+						"Location");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			get.releaseConnection();
+			get.abort();
+		}
+
+		return location;
 	}
+
 }

@@ -20,7 +20,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.jobfinder.addons.IAddonInterface;
+import com.jobfinder.addons.AbstractJobFactory;
 import com.jobfinder.common.JobDetail;
 import com.jobfinder.common.JobList;
 import com.jobfinder.common.JobListEntry;
@@ -29,27 +29,27 @@ import com.jobfinder.utils.StringTool;
 import com.jobfinder.utils.Xml2JsonUtil;
 
 @SuppressWarnings("deprecation")
-public class CareerbuilderAddon implements IAddonInterface {
+public class CareerbuilderFactory extends AbstractJobFactory {
 	
 	/**
 	 * Singleton
 	 */
-	private static CareerbuilderAddon instance;
+	private static CareerbuilderFactory instance;
 	
-	public static CareerbuilderAddon getInstance(){
-        if(instance==null)//1    
-            synchronized(CareerbuilderAddon.class){//2    
-                if(instance==null)//3    
-                	instance = new CareerbuilderAddon();//4
+	public static CareerbuilderFactory getInstance(){
+        if(instance==null) 
+            synchronized(CareerbuilderFactory.class){
+                if(instance==null)
+                	instance = new CareerbuilderFactory();
             }    
         return instance;
     }
 
-	private HttpClient httpClient = new DefaultHttpClient();
 
+	private HttpClient httpClient = new DefaultHttpClient();
+	
 	@Override
 	public JobList getJobList(JobListQueryParameters p) {
-
 		List<NameValuePair> qparams = new ArrayList<NameValuePair>();
 		// DeveloperKey=WDHL5DS66L2JTCTLYM63&HostSite=US&Keywords=software&OrderBy=Date
 		qparams.add(new BasicNameValuePair("DeveloperKey",
@@ -72,7 +72,6 @@ public class CareerbuilderAddon implements IAddonInterface {
 					"api.careerbuilder.com", -1, "/v1/jobsearch",
 					URLEncodedUtils.format(qparams, "UTF-8"), null);
 		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
 		}
@@ -133,7 +132,6 @@ public class CareerbuilderAddon implements IAddonInterface {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -142,6 +140,7 @@ public class CareerbuilderAddon implements IAddonInterface {
 		}
 
 		return list;
+
 	}
 
 	@Override
@@ -158,7 +157,6 @@ public class CareerbuilderAddon implements IAddonInterface {
 					"api.careerbuilder.com", -1, "/v1/job",
 					URLEncodedUtils.format(qparams, "UTF-8"), null);
 		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return null;
 		}
@@ -231,7 +229,6 @@ public class CareerbuilderAddon implements IAddonInterface {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -240,21 +237,6 @@ public class CareerbuilderAddon implements IAddonInterface {
 		}
 		
 		return job;
-	}
-
-
-	public static void main(String[] args) {
-		
-		JobListQueryParameters p = new JobListQueryParameters();
-		String[] keywords = {"software"};
-		p.setKeywords(keywords);
-		p.setLocation("arlington, va");
-		
-		CareerbuilderAddon cba = new CareerbuilderAddon();
-		//JobDetail job = cba.getJobDetail("JHT8G45Y2JNM4BZW35T");
-		JobList job = cba.getJobList(p);
-		System.out.println(JSONObject.fromObject(job).toString());
-		
 	}
 
 }
