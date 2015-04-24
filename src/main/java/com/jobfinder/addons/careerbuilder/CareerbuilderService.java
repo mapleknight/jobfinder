@@ -20,7 +20,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.jobfinder.addons.AbstractJobFactory;
+import com.jobfinder.addons.JobServiceInterface;
 import com.jobfinder.beans.JobDetail;
 import com.jobfinder.beans.JobList;
 import com.jobfinder.beans.JobListEntry;
@@ -29,22 +29,22 @@ import com.jobfinder.utils.StringTool;
 import com.jobfinder.utils.Xml2JsonUtil;
 
 @SuppressWarnings("deprecation")
-public class CareerbuilderFactory extends AbstractJobFactory {
-	
+
+public class CareerbuilderService implements JobServiceInterface {
 	/**
 	 * Singleton
 	 */
-	private static CareerbuilderFactory instance;
+	private static CareerbuilderService instance;
+	private CareerbuilderService(){}
 	
-	public static CareerbuilderFactory getInstance(){
+	public static JobServiceInterface getInstance(){
         if(instance==null) 
-            synchronized(CareerbuilderFactory.class){
+            synchronized(CareerbuilderService.class){
                 if(instance==null)
-                	instance = new CareerbuilderFactory();
+                	instance = new CareerbuilderService();
             }    
         return instance;
     }
-
 
 	private HttpClient httpClient = new DefaultHttpClient();
 	
@@ -238,5 +238,4 @@ public class CareerbuilderFactory extends AbstractJobFactory {
 		
 		return job;
 	}
-
 }

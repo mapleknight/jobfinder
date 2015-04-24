@@ -18,7 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
-import com.jobfinder.addons.AbstractJobFactory;
+import com.jobfinder.addons.JobServiceInterface;
 import com.jobfinder.beans.JobDetail;
 import com.jobfinder.beans.JobList;
 import com.jobfinder.beans.JobListEntry;
@@ -27,26 +27,27 @@ import com.jobfinder.utils.GeoUtil;
 import com.jobfinder.utils.StringTool;
 
 @SuppressWarnings("deprecation")
-public class JobserveFactory extends AbstractJobFactory {
+
+public class JobserveService implements JobServiceInterface {
 	
 	/**
 	 * Singleton
 	 */
-	private static JobserveFactory instance;
+	private static JobserveService instance;
+	private JobserveService(){}
 
-	public static JobserveFactory getInstance() {
+	public static JobServiceInterface getInstance() {
 		if (instance == null)
-			synchronized (JobserveFactory.class) {
+			synchronized (JobserveService.class) {
 				if (instance == null)
-					instance = new JobserveFactory();
+					instance = new JobserveService();
 			}
 		return instance;
 	}
-
+	
 	private static final String AuthorizationHeader = "token 6t6eXsLhq8JuESV3ZjXUQCdUzxzcpM3r3kZif239d-85w2Abc-avgvmelgAouveRxGouN6Yx-fAmVfT54d-MYsw5ohP_tqC-uIrQviJY8X8vRx_0Do4AfDdqaYVJCRYqiv2MQVTlB9aEX6z7r748QMYRWynYAZF8Y6Xd3hEYzQU";
 
 	private HttpClient httpClient = new DefaultHttpClient();
-
 
 	@Override
 	public JobList getJobList(JobListQueryParameters p) {
@@ -257,5 +258,4 @@ public class JobserveFactory extends AbstractJobFactory {
 
 		return location;
 	}
-
 }

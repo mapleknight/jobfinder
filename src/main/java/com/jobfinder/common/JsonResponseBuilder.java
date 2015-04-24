@@ -20,6 +20,4 @@ public class JsonResponseBuilder extends ResponseBuilder {
 	public Object getRespObj() {
 		return respObj;
 	}
-
-
 }

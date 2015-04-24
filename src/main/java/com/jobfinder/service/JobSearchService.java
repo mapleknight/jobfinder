@@ -1,22 +1,24 @@
 package com.jobfinder.service;
 
-import com.jobfinder.addons.AbstractJobFactory;
-import com.jobfinder.addons.AddonFactory;
+import com.jobfinder.addons.AbstractFactory;
+import com.jobfinder.addons.FactoryProducer;
+import com.jobfinder.addons.JobServiceInterface;
 import com.jobfinder.beans.JobDetail;
 import com.jobfinder.beans.JobList;
 import com.jobfinder.beans.JobListQueryParameters;
 import com.jobfinder.common.*;
 
 public class JobSearchService {
-
+	
 	public Object getJobList(JobListQueryParameters p, String jobSource) {
 		ResponseDirector respDirector = new ResponseDirector();
 		ResponseBuilder respBuilder = new JsonResponseBuilder();
 		respDirector.setRespBuilder(respBuilder);
 		
-		AbstractJobFactory jobSearchAddon = AddonFactory.getConcreteFactory(jobSource);
+		AbstractFactory jobFactory = FactoryProducer.getFactory("job");
+		JobServiceInterface jobService = jobFactory.getJobService(jobSource);
 		
-		JobList jobList = jobSearchAddon.getJobList(p);
+		JobList jobList = jobService.getJobList(p);
 		if(null == jobList)
 		{
 			respDirector.constructRespObj(null, StateCode.FAILED_SYSTEM);
@@ -33,9 +35,10 @@ public class JobSearchService {
 		ResponseBuilder respBuilder = new JsonResponseBuilder();
 		respDirector.setRespBuilder(respBuilder);
 		
-		AbstractJobFactory jobSearchAddon = AddonFactory.getConcreteFactory(jobSource);
+		AbstractFactory jobFactory = FactoryProducer.getFactory("job");
+		JobServiceInterface jobService = jobFactory.getJobService(jobSource);
 		
-		JobDetail job = jobSearchAddon.getJobDetail(jobID);
+		JobDetail job = jobService.getJobDetail(jobID);
 		if(null == job)
 		{
 			respDirector.constructRespObj(null, StateCode.FAILED_SYSTEM);

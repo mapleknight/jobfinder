@@ -19,6 +19,4 @@ public class ResponseDirector {
 		respBuilder.setState(state);
 		
 	}
-	
-
 }
